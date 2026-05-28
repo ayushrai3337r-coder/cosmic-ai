@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Notes — Cosmic AI</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.viewer-wrap {
+  background: #f5f5f5;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: 85vh;
+}
+.watermark-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.watermark-text {
+  font-size: 48px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.06);
+  transform: rotate(-30deg);
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 4px;
+}
+.protected-bar {
+  background: rgba(255,101,132,0.06);
+  border: 1px solid rgba(255,101,132,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">C</div>
+    Cosmic AI
+  </div>
+  <div class="nav-actions">
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,101,132,0.08);border:1px solid rgba(255,101,132,0.2);border-radius:8px">
+      <svg width="14" height="14" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="font-size:13px;font-weight:600;color:var(--accent2)">Protected</span>
+    </div>
+    <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-ghost">Back</button>
+  </div>
+</nav>
+
+<main style="padding-top:64px">
+  <div style="max-width:960px;margin:0 auto;padding:32px 24px">
+
+    <div style="margin-bottom:20px">
+      <button onclick="window.location.href='/pages/dashboard.html'" style="display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px;margin-bottom:16px;font-family:'DM Sans',sans-serif;font-weight:500">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Dashboard
+      </button>
+      <h1 class="serif" style="font-size:24px;font-weight:700;color:var(--text);margin-bottom:6px" id="pdfTitle">Loading...</h1>
+      <p style="font-size:13px;color:var(--text2)">View only. Screenshots and downloads are not allowed.</p>
+    </div>
+
+    <div class="protected-bar">
+      <svg width="16" height="16" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="font-size:13px;color:var(--text2)">This content is <strong style="color:var(--text)">protected and watermarked</strong> with your account. Sharing is prohibited.</span>
+    </div>
+
+    <div class="viewer-wrap" id="viewerWrap">
+      <div class="watermark-overlay">
+        <div class="watermark-text" id="watermarkText">COSMIC AI PROTECTED</div>
+      </div>
+      <div id="pdfContainer" style="width:100%;min-height:85vh;display:flex;align-items:center;justify-content:center">
+        <p style="color:var(--text2)">Loading PDF...</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+      <div class="card-flat" style="text-align:center;padding:16px">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Status</div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent3)">Active</div>
+      </div>
+      <div class="card-flat" style="text-align:center;padding:16px">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Expires</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)" id="expiryInfo">Loading...</div>
+      </div>
+      <div class="card-flat" style="text-align:center;padding:16px">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Access</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">View Only</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const token = localStorage.getItem('cosmicToken');
+const user = JSON.parse(localStorage.getItem('cosmicUser') || '{}');
+if (!token) window.location.href = '/pages/login.html';
+
+const params = new URLSearchParams(window.location.search);
+const pdfId = params.get('id');
+const pdfTitle = decodeURIComponent(params.get('title') || '');
+
+window.onload = async () => {
+  document.getElementById('pdfTitle').textContent = pdfTitle;
+  document.getElementById('watermarkText').textContent = (user.email || 'COSMIC AI') + ' — PROTECTED';
+
+  try {
+    const res = await fetch('/api/pdfs/' + pdfId + '/view', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById('pdfContainer').innerHTML = `
+        <div style="padding:60px;text-align:center">
+          <p style="color:var(--accent2);font-size:16px;font-weight:600;margin-bottom:12px">Access Denied</p>
+          <p style="color:var(--text2);font-size:14px;margin-bottom:24px">You do not have access or subscription has expired.</p>
+          <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-primary">Go to Dashboard</button>
+        </div>
+      `;
+      return;
+    }
+
+    if (data.expiryDate) {
+      document.getElementById('expiryInfo').textContent = new Date(data.expiryDate).toLocaleDateString('en-IN');
+    }
+
+    const filePath = data.filePath;
+    const container = document.getElementById('pdfContainer');
+
+    // Try Google Docs viewer first (works on mobile too)
+    const fullUrl = window.location.origin + filePath;
+    const googleDocsUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(fullUrl) + '&embedded=true';
+
+    container.innerHTML = `
+      <iframe
+        src="${googleDocsUrl}"
+        style="width:100%;height:85vh;border:none;display:block;border-radius:8px"
+        allowfullscreen
+      ></iframe>
+    `;
+
+  } catch (err) {
+    document.getElementById('pdfContainer').innerHTML = `
+      <div style="padding:60px;text-align:center">
+        <p style="color:var(--accent2);font-size:15px;margin-bottom:16px">Failed to load PDF.</p>
+        <button onclick="window.location.reload()" class="btn btn-ghost">Retry</button>
+      </div>
+    `;
+  }
+};
+
+document.addEventListener('keydown', (e) => {
+  if (
+    (e.ctrlKey && e.key === 's') ||
+    (e.ctrlKey && e.key === 'p') ||
+    (e.ctrlKey && e.key === 'u') ||
+    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+    e.key === 'F12'
+  ) {
+    e.preventDefault();
+    showToast('This action is not allowed');
+    document.getElementById('viewerWrap').style.filter = 'blur(20px)';
+    setTimeout(() => {
+      document.getElementById('viewerWrap').style.filter = 'none';
+    }, 2000);
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    document.getElementById('viewerWrap').style.filter = 'blur(20px)';
+  } else {
+    setTimeout(() => {
+      document.getElementById('viewerWrap').style.filter = 'none';
+    }, 1000);
+  }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

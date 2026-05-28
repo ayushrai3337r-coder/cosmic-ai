@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase History — Cosmic AI</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">C</div>
+    Cosmic AI
+  </div>
+  <div class="nav-actions">
+    <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-ghost">Back to Dashboard</button>
+  </div>
+</nav>
+
+<main style="padding-top:64px">
+  <div style="max-width:800px;margin:0 auto;padding:40px 24px">
+
+    <button onclick="window.location.href='/pages/dashboard.html'" style="display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px;margin-bottom:32px;font-family:'DM Sans',sans-serif;font-weight:500">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+
+    <div style="margin-bottom:32px">
+      <h1 class="serif" style="font-size:28px;font-weight:700;color:var(--white);margin-bottom:8px">Purchase History</h1>
+      <p style="color:var(--text2);font-size:14px">All your transactions and access history</p>
+    </div>
+
+    <div id="historyList">
+      <div style="text-align:center;padding:40px;color:var(--text2)">Loading...</div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const token = localStorage.getItem('cosmicToken');
+if (!token) window.location.href = '/pages/login.html';
+
+window.onload = async () => {
+  try {
+    const res = await fetch('/api/payments/my-history', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    const list = document.getElementById('historyList');
+
+    if (!data.history || data.history.length === 0) {
+      list.innerHTML = `
+        <div style="text-align:center;padding:80px 20px;border:1px dashed var(--border);border-radius:16px">
+          <div style="width:64px;height:64px;background:var(--bg3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+            <svg width="28" height="28" fill="none" stroke="var(--text2)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <p style="font-size:15px;color:var(--text2);margin-bottom:20px">No purchases yet</p>
+          <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-primary">Browse Materials</button>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = data.history.map(h => {
+      const statusColor = h.status === 'approved' || h.accessStatus === 'active'
+        ? 'badge-green'
+        : h.status === 'pending'
+        ? 'badge-yellow'
+        : h.status === 'rejected'
+        ? 'badge-red'
+        : 'badge-gray';
+
+      const statusText = h.status === 'approved' || h.accessStatus === 'active'
+        ? 'Active'
+        : h.status === 'pending'
+        ? 'Pending Verification'
+        : h.status === 'rejected'
+        ? 'Rejected'
+        : h.accessStatus === 'expired'
+        ? 'Expired'
+        : h.status;
+
+      return `
+        <div class="card-flat" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:16px">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+                <h3 style="font-size:16px;font-weight:700;color:var(--white)">${h.pdfTitle}</h3>
+                <span class="badge ${statusColor}">${statusText}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:13px;color:var(--text2)">
+                <div>Board: <span style="color:var(--text);font-weight:500">${h.pdfBoard?.toUpperCase()}</span></div>
+                <div>Amount: <span style="color:var(--accent2);font-weight:700">Rs.${h.amount}</span></div>
+                <div>Date: <span style="color:var(--text);font-weight:500">${new Date(h.submittedAt).toLocaleDateString('en-IN')}</span></div>
+                ${h.expiryDate ? `<div>Expires: <span style="color:var(--text);font-weight:500">${new Date(h.expiryDate).toLocaleDateString('en-IN')}</span></div>` : ''}
+              </div>
+            </div>
+            ${h.status === 'approved' && h.accessStatus === 'active' ? `
+              <button onclick="window.location.href='/pages/viewer.html?id=${h.pdfId}&title=${encodeURIComponent(h.pdfTitle)}&file='" class="btn btn-primary" style="padding:10px 20px;font-size:13px;white-space:nowrap">
+                Open Notes
+              </button>
+            ` : h.status === 'pending' ? `
+              <div style="padding:10px 16px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;font-size:13px;color:#fbbf24;font-weight:500;white-space:nowrap">
+                Awaiting Approval
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch {
+    document.getElementById('historyList').innerHTML = `
+      <div style="text-align:center;padding:40px;color:var(--accent2)">Failed to load history. Try again.</div>
+    `;
+  }
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

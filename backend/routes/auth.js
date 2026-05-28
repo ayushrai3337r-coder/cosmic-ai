@@ -1,0 +1,146 @@
+const express = require('express');
+const router = express.Router();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
+const { sql } = require('../database');
+
+const makeToken = (user) => jwt.sign(
+  { id: user.id, email: user.email },
+  process.env.JWT_SECRET || 'cosmicai_secret',
+  { expiresIn: '30d' }
+);
+
+// Firebase Login (Google + Email)
+router.post('/firebase', async (req, res) => {
+  try {
+    const { firebaseUid, name, email, picture, authType } = req.body;
+    if (!firebaseUid || !email) {
+      return res.status(400).json({ error: 'Invalid data' });
+    }
+
+    let users = await sql`
+      SELECT * FROM users WHERE firebase_uid = ${firebaseUid}
+    `;
+
+    let user;
+
+    if (users.length === 0) {
+      const id = uuidv4();
+      await sql`
+        INSERT INTO users (id, firebase_uid, name, email, picture, auth_type)
+        VALUES (${id}, ${firebaseUid}, ${name}, ${email}, ${picture || ''}, ${authType || 'google'})
+      `;
+      users = await sql`SELECT * FROM users WHERE id = ${id}`;
+    }
+
+    user = users[0];
+
+    res.json({
+      success: true,
+      token: makeToken(user),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email Register
+router.post('/email-register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Fill all fields' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password min 6 characters' });
+    }
+
+    const existing = await sql`
+      SELECT id FROM users WHERE email = ${email}
+    `;
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    const id = uuidv4();
+    const hashed = bcrypt.hashSync(password, 10);
+
+    await sql`
+      INSERT INTO users (id, firebase_uid, name, email, picture, auth_type)
+      VALUES (${id}, ${id}, ${name}, ${email}, ${''}, ${'email'})
+    `;
+
+    const user = { id, name, email, picture: '' };
+
+    res.json({
+      success: true,
+      token: makeToken(user),
+      user
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email Login
+router.post('/email-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Fill all fields' });
+    }
+
+    const users = await sql`
+      SELECT * FROM users WHERE email = ${email} AND auth_type = 'email'
+    `;
+    if (users.length === 0) {
+      return res.status(401).json({ error: 'Email not found' });
+    }
+
+    res.json({
+      success: true,
+      token: makeToken(users[0]),
+      user: {
+        id: users[0].id,
+        name: users[0].name,
+        email: users[0].email,
+        picture: users[0].picture
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify Token
+router.get('/verify', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'No token' });
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'cosmicai_secret'
+    );
+
+    const users = await sql`
+      SELECT id, name, email, picture FROM users WHERE id = ${decoded.id}
+    `;
+    if (users.length === 0) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true, user: users[0] });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+module.exports = router;

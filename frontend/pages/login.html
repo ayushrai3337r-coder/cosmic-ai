@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Cosmic AI</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.login-left {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.login-left::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: var(--accent);
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.08;
+  top: -100px;
+  left: -100px;
+}
+.login-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--bg);
+}
+.login-box {
+  width: 100%;
+  max-width: 400px;
+}
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.google-btn:hover {
+  border-color: var(--accent);
+  background: var(--card2);
+}
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  color: var(--text2);
+  font-size: 13px;
+}
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.tabs {
+  display: flex;
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.tab.active {
+  background: var(--card2);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.quote-card {
+  background: rgba(108,99,255,0.08);
+  border: 1px solid rgba(108,99,255,0.2);
+  border-radius: 16px;
+  padding: 28px;
+}
+@media (max-width: 768px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-left { display: none; }
+  .login-right { padding: 80px 24px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-page">
+
+  <!-- LEFT SIDE -->
+  <div class="login-left">
+    <a href="/" class="logo" style="text-decoration:none">
+      <div class="logo-icon">C</div>
+      Cosmic AI
+    </a>
+
+    <div style="position:relative;z-index:1">
+      <h2 style="font-size:36px;font-weight:800;color:var(--white);line-height:1.2;margin-bottom:20px">
+        Your exam success<br>starts here
+      </h2>
+      <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:40px">
+        Access premium study materials for SSC, MSBTE and CBSE boards. Chapter-wise notes, important questions and solved papers — all in one place.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:40px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;background:rgba(108,99,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+          </div>
+          <span style="font-size:14px;color:var(--text2)">Important questions for all boards</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;background:rgba(67,233,123,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" fill="none" stroke="#43e97b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+          </div>
+          <span style="font-size:14px;color:var(--text2)">Secure view-only access, no downloads</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:36px;height:36px;background:rgba(255,101,132,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" fill="none" stroke="#ff6584" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+          </div>
+          <span style="font-size:14px;color:var(--text2)">Pay via UPI and get instant access</span>
+        </div>
+      </div>
+
+      <div class="quote-card">
+        <p style="font-size:15px;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:16px">
+          "Cosmic AI helped me score 87% in SSC boards. The important questions were exactly what came in the exam."
+        </p>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px">R</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--white)">Rahul Patil</div>
+            <div style="font-size:12px;color:var(--text2)">SSC Student, Pune</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--text2)">
+      2025 Cosmic AI. All rights reserved.
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="login-right">
+    <div class="login-box">
+
+      <div style="margin-bottom:32px">
+        <h2 style="font-size:28px;font-weight:700;color:var(--white);margin-bottom:8px">Welcome back</h2>
+        <p style="font-size:14px;color:var(--text2)">Sign in to access your study materials</p>
+      </div>
+
+      <!-- Google Login -->
+      <button class="google-btn" onclick="googleLogin()">
+        <svg width="20" height="20" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.6 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 5C9.7 39.4 16.4 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.2 5.2C40.3 36.1 44 30.6 44 24c0-1.3-.1-2.7-.4-4z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="or-divider">or continue with email</div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" onkeydown="if(event.key==='Enter')emailLogin()">
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;justify-content:center" onclick="emailLogin()">
+          Sign In
+        </button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" style="display:none">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Create a password (min 6 chars)" onkeydown="if(event.key==='Enter')emailRegister()">
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;justify-content:center" onclick="emailRegister()">
+          Create Account
+        </button>
+      </div>
+
+      <p style="text-align:center;font-size:12px;color:var(--text2);margin-top:24px">
+        By signing in you agree to our Terms of Service and Privacy Policy
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(tab) {
+  if (tab === 'login') {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('tabLogin').classList.add('active');
+    document.getElementById('tabRegister').classList.remove('active');
+  } else {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('tabRegister').classList.add('active');
+  }
+}
+
+async function googleLogin() {
+  const mockUser = {
+    googleId: 'google_' + Date.now(),
+    name: 'Student User',
+    email: 'student@gmail.com',
+    picture: ''
+  };
+  try {
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mockUser)
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('cosmicToken', data.token);
+      localStorage.setItem('cosmicUser', JSON.stringify(data.user));
+      window.location.href = '/pages/dashboard.html';
+    } else {
+      showToast('Login failed. Try again.');
+    }
+  } catch {
+    showToast('Server error. Try again.');
+  }
+}
+
+async function emailLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showToast('Fill all fields'); return; }
+  try {
+    const res = await fetch('/api/auth/email-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('cosmicToken', data.token);
+      localStorage.setItem('cosmicUser', JSON.stringify(data.user));
+      window.location.href = '/pages/dashboard.html';
+    } else {
+      showToast(data.error || 'Login failed');
+    }
+  } catch {
+    showToast('Server error. Try again.');
+  }
+}
+
+async function emailRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  if (!name || !email || !password) { showToast('Fill all fields'); return; }
+  if (password.length < 6) { showToast('Password must be 6+ characters'); return; }
+  try {
+    const res = await fetch('/api/auth/email-register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('cosmicToken', data.token);
+      localStorage.setItem('cosmicUser', JSON.stringify(data.user));
+      window.location.href = '/pages/dashboard.html';
+    } else {
+      showToast(data.error || 'Registration failed');
+    }
+  } catch {
+    showToast('Server error. Try again.');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

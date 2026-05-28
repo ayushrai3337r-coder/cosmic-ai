@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic AI — Smart Study for Every Student</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">C</div>
+    Cosmic AI
+  </div>
+  <div class="nav-actions" id="navActions">
+    <button class="btn btn-outline hide-mobile" onclick="window.location.href='/pages/login.html'">Sign In</button>
+    <button class="btn btn-primary" onclick="window.location.href='/pages/login.html'">Get Started</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+    <div style="position:relative;z-index:1;max-width:700px;margin:0 auto">
+      <div class="hero-tag">
+        SSC, MSBTE and CBSE Notes Now Available
+      </div>
+      <h1 class="hero-title">
+        Study Smarter,<br>
+        <span>Score Higher</span>
+      </h1>
+      <p class="hero-sub">
+        Access chapter-wise important questions, solved papers and detailed notes for SSC, MSBTE and CBSE boards — all in one place, secured and easy to access.
+      </p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" style="padding:14px 32px;font-size:15px" onclick="window.location.href='/pages/login.html'">Start Learning</button>
+        <button class="btn btn-outline" style="padding:14px 32px;font-size:15px" onclick="document.getElementById('boards').scrollIntoView({behavior:'smooth'})">Explore Boards</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">2,400+</div>
+          <div class="stat-label">Students</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div class="stat-item">
+          <div class="stat-num">150+</div>
+          <div class="stat-label">Study Materials</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Boards Covered</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOARDS -->
+  <section class="section" id="boards">
+    <div style="margin-bottom:48px">
+      <div class="section-tag">Boards We Cover</div>
+      <h2 class="section-title">Choose Your Board</h2>
+      <p class="section-sub">Select your education board to access relevant study materials, important questions and solved papers.</p>
+    </div>
+    <div class="grid-3">
+
+      <div class="board-card board-card-ssc" onclick="window.location.href='/pages/login.html'">
+        <div class="board-icon board-icon-ssc">S</div>
+        <h3 style="font-size:22px;font-weight:700;color:var(--white);margin-bottom:12px">SSC Board</h3>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:20px">Maharashtra Secondary School Certificate — Class 10 study materials, important questions and solved papers.</p>
+        <div style="font-size:13px;color:var(--text2);border-top:1px solid var(--border);padding-top:16px">
+          Math, Science, English, Hindi, Social Studies
+        </div>
+      </div>
+
+      <div class="board-card board-card-msbte" onclick="window.location.href='/pages/login.html'">
+        <div class="board-icon board-icon-msbte">M</div>
+        <h3 style="font-size:22px;font-weight:700;color:var(--white);margin-bottom:12px">MSBTE Board</h3>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:20px">Maharashtra State Board of Technical Education — Diploma engineering notes and question banks.</p>
+        <div style="font-size:13px;color:var(--text2);border-top:1px solid var(--border);padding-top:16px">
+          All Diploma Branches Available
+        </div>
+      </div>
+
+      <div class="board-card board-card-cbse" onclick="window.location.href='/pages/login.html'">
+        <div class="board-icon board-icon-cbse">C</div>
+        <h3 style="font-size:22px;font-weight:700;color:var(--white);margin-bottom:12px">CBSE Board</h3>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:20px">Central Board of Secondary Education — Class 10 and 12 notes, NCERT solutions and important questions.</p>
+        <div style="font-size:13px;color:var(--text2);border-top:1px solid var(--border);padding-top:16px">
+          All Subjects for Class 10 and 12
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="padding:80px 24px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:60px">
+        <div class="section-tag">Simple Process</div>
+        <h2 class="section-title">How It Works</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px">
+        <div style="text-align:center">
+          <div class="step-num">01</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px">Sign In</h3>
+          <p style="font-size:14px;color:var(--text2);line-height:1.7">Login with Google or create an account with email and password</p>
+        </div>
+        <div style="text-align:center">
+          <div class="step-num">02</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px">Choose Board</h3>
+          <p style="font-size:14px;color:var(--text2);line-height:1.7">Select SSC, MSBTE or CBSE board to see available materials</p>
+        </div>
+        <div style="text-align:center">
+          <div class="step-num">03</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px">Pick Material</h3>
+          <p style="font-size:14px;color:var(--text2);line-height:1.7">Browse and select the subject notes you need for exam prep</p>
+        </div>
+        <div style="text-align:center">
+          <div class="step-num">04</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px">Pay and Access</h3>
+          <p style="font-size:14px;color:var(--text2);line-height:1.7">Pay via UPI and get access to read notes directly on website</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div style="margin-bottom:48px">
+      <div class="section-tag">Why Cosmic AI</div>
+      <h2 class="section-title">Everything You Need</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card-flat">
+        <div style="width:44px;height:44px;background:rgba(108,99,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+          <svg width="20" height="20" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--white);margin-bottom:8px">Secure Access</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7">All notes are watermarked and protected. No downloads, view only on website.</p>
+      </div>
+      <div class="card-flat">
+        <div style="width:44px;height:44px;background:rgba(67,233,123,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+          <svg width="20" height="20" fill="none" stroke="#43e97b" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--white);margin-bottom:8px">Verified Content</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7">All study materials are verified and updated for latest board syllabus.</p>
+      </div>
+      <div class="card-flat">
+        <div style="width:44px;height:44px;background:rgba(255,101,132,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+          <svg width="20" height="20" fill="none" stroke="#ff6584" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--white);margin-bottom:8px">Instant Access</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7">Pay via UPI and get access within minutes after admin verification.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="logo" style="justify-content:center;margin-bottom:16px">
+      <div class="logo-icon">C</div>
+      Cosmic AI
+    </div>
+    <p style="font-size:13px;color:var(--text2)">
+      Smart study materials for every student. SSC, MSBTE and CBSE boards covered.
+    </p>
+    <div style="margin-top:16px;font-size:12px;color:var(--text2)">
+      2025 Cosmic AI. All rights reserved.
+    </div>
+  </footer>
+
+</main>
+
+
+<script src="/js/main.js"></script>
+</body>
+</html>

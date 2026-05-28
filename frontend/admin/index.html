@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Cosmic AI</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 240px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  overflow-y: auto;
+}
+.admin-main {
+  margin-left: 240px;
+  flex: 1;
+  padding: 32px;
+  min-height: 100vh;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover {
+  color: var(--white);
+  background: rgba(255,255,255,0.04);
+}
+.nav-item.active {
+  color: var(--accent);
+  background: rgba(108,99,255,0.08);
+  border-left-color: var(--accent);
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: 'Playfair Display', serif;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.section-header {
+  margin-bottom: 28px;
+}
+.section-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.section-header p {
+  font-size: 14px;
+  color: var(--text2);
+}
+@media(max-width:768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 8px;
+  }
+  .admin-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+  .nav-item {
+    padding: 10px 14px;
+    font-size: 12px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+  .nav-item.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--accent);
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
+  <div style="width:90%;max-width:400px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div class="logo-icon" style="margin:0 auto 16px;width:52px;height:52px;font-size:24px">C</div>
+      <h2 class="serif" style="font-size:26px;font-weight:700;color:var(--white);margin-bottom:8px">Admin Panel</h2>
+      <p style="font-size:14px;color:var(--text2)">Cosmic AI — Restricted Access Only</p>
+    </div>
+    <div class="card-flat">
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" id="adminPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <button onclick="adminLogin()" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;justify-content:center">
+        Login to Admin Panel
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="adminPanel" style="display:none">
+  <div class="admin-layout">
+
+    <div class="sidebar">
+      <div style="padding:24px">
+        <div class="logo">
+          <div class="logo-icon" style="width:32px;height:32px;font-size:16px">C</div>
+          <span style="font-size:16px">Cosmic AI</span>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;padding-left:44px">Admin Panel</div>
+      </div>
+
+      <nav style="flex:1;padding:8px 0">
+        <button class="nav-item active" onclick="showSection('dashboard',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" onclick="showSection('payments',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+          Payment Requests
+        </button>
+        <button class="nav-item" onclick="showSection('pdfs',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+          Manage PDFs
+        </button>
+        <button class="nav-item" onclick="showSection('students',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Students
+        </button>
+        <button class="nav-item" onclick="showSection('revenue',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 110 7H6"/></svg>
+          Revenue
+        </button>
+        <button class="nav-item" onclick="showSection('settings',this)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </button>
+      </nav>
+
+      <div style="padding:16px 24px;border-top:1px solid var(--border)">
+        <button onclick="adminLogout()" class="btn btn-danger" style="width:100%;justify-content:center;padding:10px">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-main" id="adminContent"></div>
+
+  </div>
+</div>
+
+<div id="approveModal" class="modal">
+  <div class="modal-box">
+    <h3 class="serif" style="font-size:20px;font-weight:700;color:var(--white);margin-bottom:20px">Approve Payment</h3>
+    <input type="hidden" id="approveId">
+    <div class="form-group">
+      <label>Access Duration</label>
+      <select id="approveDuration" onchange="toggleCustom(this.value)">
+        <option value="30">30 Days</option>
+        <option value="60">60 Days</option>
+        <option value="90">90 Days</option>
+        <option value="180">180 Days — 6 Months</option>
+        <option value="365">365 Days — 1 Year</option>
+        <option value="custom">Custom Days</option>
+      </select>
+    </div>
+    <div class="form-group" id="customGroup" style="display:none">
+      <label>Custom Days</label>
+      <input type="number" id="customDays" placeholder="Enter number of days">
+    </div>
+    <div style="display:flex;gap:12px">
+      <button onclick="confirmApprove()" class="btn btn-success" style="flex:1;padding:12px;justify-content:center">Approve Access</button>
+      <button onclick="closeModal()" class="btn btn-ghost" style="flex:1;padding:12px;justify-content:center">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let adminToken = localStorage.getItem('cosmicAdminToken');
+
+window.onload = () => {
+  if (adminToken) {
+    showAdminPanel();
+    renderDashboard();
+  }
+};
+
+function toggleCustom(val) {
+  document.getElementById('customGroup').style.display = val === 'custom' ? 'block' : 'none';
+}
+
+async function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (!pass) { showToast('Enter password'); return; }
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      adminToken = data.token;
+      localStorage.setItem('cosmicAdminToken', adminToken);
+      showAdminPanel();
+      renderDashboard();
+    } else {
+      showToast('Wrong password');
+    }
+  } catch {
+    showToast('Server error');
+  }
+}
+
+function adminLogout() {
+  localStorage.removeItem('cosmicAdminToken');
+  adminToken = null;
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function showAdminPanel() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+}
+
+function showSection(section, btn) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (section === 'dashboard') renderDashboard();
+  else if (section === 'payments') renderPayments();
+  else if (section === 'pdfs') renderPDFs();
+  else if (section === 'students') renderStudents();
+  else if (section === 'revenue') renderRevenue();
+  else if (section === 'settings') renderSettings();
+}
+
+async function renderDashboard() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--text2)">Loading...</div>`;
+  try {
+    const res = await fetch('/api/admin/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    const data = await res.json();
+    const s = data.stats;
+    c.innerHTML = `
+      <div class="section-header">
+        <h1>Dashboard</h1>
+        <p>Overview of Cosmic AI platform</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px">
+        ${[
+          {label:'Total Revenue',value:'Rs.'+s.totalRevenue,color:'var(--accent3)'},
+          {label:'Total Students',value:s.totalStudents,color:'var(--accent)'},
+          {label:'Total PDFs',value:s.totalPdfs,color:'var(--accent2)'},
+          {label:'Pending Requests',value:s.pendingRequests,color:'#fbbf24'},
+          {label:'Active Access',value:s.activePurchases,color:'var(--accent3)'},
+          {label:'Total Sales',value:s.totalSales,color:'var(--accent)'}
+        ].map(st => `
+          <div class="stat-card">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${st.label}</div>
+            <div class="stat-value" style="color:${st.color}">${st.value}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card-flat">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h2 style="font-size:16px;font-weight:700;color:var(--white)">Recent Payments</h2>
+          <button onclick="showSection('payments')" class="btn btn-ghost" style="padding:8px 14px;font-size:12px">View All</button>
+        </div>
+        ${data.recentPayments && data.recentPayments.length > 0 ? `
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>PDF</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.recentPayments.map(p => `
+                <tr>
+                  <td>
+                    <div style="font-weight:600;color:var(--white)">${p.userName}</div>
+                    <div style="font-size:12px;color:var(--text2)">${p.userEmail}</div>
+                  </td>
+                  <td style="color:var(--text2)">${p.pdfTitle}</td>
+                  <td style="font-weight:700;color:var(--accent2)">Rs.${p.amount}</td>
+                  <td>
+                    <span class="badge ${p.status==='approved'?'badge-green':p.status==='pending'?'badge-yellow':'badge-red'}">
+                      ${p.status==='approved'?'Approved':p.status==='pending'?'Pending':'Rejected'}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : `<div style="text-align:center;padding:32px;color:var(--text2)">No payments yet</div>`}
+      </div>
+      ${Object.keys(data.revenueBySubject||{}).length > 0 ? `
+        <div class="card-flat" style="margin-top:16px">
+          <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">Revenue by Subject</h2>
+          ${Object.entries(data.revenueBySubject).map(([sub,amt]) => `
+            <div style="margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:14px;color:var(--text)">${sub}</span>
+                <span style="font-size:14px;font-weight:700;color:var(--accent2)">Rs.${amt}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:${Math.min(100,(amt/Math.max(...Object.values(data.revenueBySubject)))*100)}%"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    `;
+  } catch {
+    c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--accent2)">Failed to load dashboard</div>`;
+  }
+}
+
+async function renderPayments() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `
+    <div class="section-header">
+      <h1>Payment Requests</h1>
+      <p>Review and approve student payments</p>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:24px">
+      <button onclick="loadPayments('pending')" class="btn btn-primary" id="btnPending">Pending</button>
+      <button onclick="loadPayments('all')" class="btn btn-ghost" id="btnAll">All Payments</button>
+    </div>
+    <div id="paymentsList"></div>
+  `;
+  loadPayments('pending');
+}
+
+async function loadPayments(type) {
+  const list = document.getElementById('paymentsList');
+  list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text2)">Loading...</div>`;
+  try {
+    const url = type === 'pending' ? '/api/admin/payments/pending' : '/api/admin/payments/all';
+    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    const data = await res.json();
+    if (!data.payments || data.payments.length === 0) {
+      list.innerHTML = `
+        <div style="text-align:center;padding:60px;border:1px dashed var(--border);border-radius:16px">
+          <p style="color:var(--text2);font-size:15px">No ${type==='pending'?'pending':''} payments</p>
+        </div>
+      `;
+      return;
+    }
+    list.innerHTML = data.payments.map(p => `
+      <div class="card-flat" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:16px">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <div style="width:40px;height:40px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:16px">${(p.userName||'U')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-weight:600;color:var(--white)">${p.userName}</div>
+                <div style="font-size:12px;color:var(--text2)">${p.userEmail}</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:13px;margin-bottom:14px">
+              <div style="color:var(--text2)">PDF: <span style="color:var(--text);font-weight:500">${p.pdfTitle}</span></div>
+              <div style="color:var(--text2)">Board: <span style="color:var(--text);font-weight:500">${p.pdfBoard?.toUpperCase()}</span></div>
+              <div style="color:var(--text2)">Amount: <span style="color:var(--accent2);font-weight:700">Rs.${p.amount}</span></div>
+              <div style="color:var(--text2)">Date: <span style="color:var(--text);font-weight:500">${new Date(p.submittedAt).toLocaleDateString('en-IN')}</span></div>
+            </div>
+            <span class="badge ${p.status==='approved'?'badge-green':p.status==='pending'?'badge-yellow':'badge-red'}">
+              ${p.status==='approved'?'Approved':p.status==='pending'?'Pending Verification':'Rejected'}
+            </span>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Screenshot</div>
+            <img src="${p.screenshotPath}" style="width:110px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--border);cursor:pointer" onclick="window.open('${p.screenshotPath}')" onerror="this.parentElement.innerHTML='<div style=padding:20px;color:var(--text2);font-size:12px>No image</div>'">
+          </div>
+        </div>
+        ${p.status === 'pending' ? `
+          <div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <button onclick="openApproveModal('${p.id}')" class="btn btn-success" style="flex:1;padding:10px;justify-content:center">Approve and Give Access</button>
+            <button onclick="rejectPayment('${p.id}')" class="btn btn-danger" style="padding:10px 20px">Reject</button>
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  } catch {
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--accent2)">Failed to load</div>`;
+  }
+}
+
+function openApproveModal(id) {
+  document.getElementById('approveId').value = id;
+  document.getElementById('approveModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('approveModal').classList.remove('open');
+}
+
+async function confirmApprove() {
+  const id = document.getElementById('approveId').value;
+  const sel = document.getElementById('approveDuration').value;
+  const duration = sel === 'custom' ? parseInt(document.getElementById('customDays').value) : parseInt(sel);
+  if (!duration || duration < 1) { showToast('Enter valid duration'); return; }
+  try {
+    const res = await fetch('/api/admin/payments/' + id + '/approve', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + adminToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ durationDays: duration })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal();
+      showToast('Payment approved. Student can now access PDF.');
+      loadPayments('pending');
+    } else {
+      showToast(data.error || 'Failed');
+    }
+  } catch {
+    showToast('Network error');
+  }
+}
+
+async function rejectPayment(id) {
+  if (!confirm('Reject this payment?')) return;
+  try {
+    const res = await fetch('/api/admin/payments/' + id + '/reject', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    const data = await res.json();
+    if (data.success) { showToast('Rejected'); loadPayments('pending'); }
+  } catch { showToast('Network error'); }
+}
+
+async function renderPDFs() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `
+    <div class="section-header">
+      <h1>Manage PDFs</h1>
+      <p>Upload and manage study materials</p>
+    </div>
+    <div class="card-flat" style="margin-bottom:24px">
+      <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">Upload New PDF</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Title</label>
+          <input type="text" id="pdfTitle" placeholder="e.g. Maths Important Questions">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Board</label>
+          <select id="pdfBoard">
+            <option value="">Select Board</option>
+            <option value="ssc">SSC Board</option>
+            <option value="msbte">MSBTE Board</option>
+            <option value="cbse">CBSE Board</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Subject</label>
+          <input type="text" id="pdfSubject" placeholder="e.g. Mathematics">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Price (Rs.)</label>
+          <input type="number" id="pdfPrice" placeholder="299">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Access Duration</label>
+          <select id="pdfDuration">
+            <option value="30">30 Days</option>
+            <option value="60">60 Days</option>
+            <option value="90">90 Days</option>
+            <option value="180">180 Days</option>
+            <option value="365">365 Days</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="pdfDesc" rows="2" placeholder="Short description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>PDF File</label>
+        <div class="upload-area" onclick="document.getElementById('pdfFile').click()">
+          <svg width="28" height="28" fill="none" stroke="var(--text2)" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 12px;display:block"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Click to select PDF</div>
+          <div style="font-size:12px;color:var(--text2)">PDF files only</div>
+        </div>
+        <input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="document.getElementById('fileName').textContent=this.files[0].name">
+        <div id="fileName" style="font-size:12px;color:var(--accent3);margin-top:8px"></div>
+      </div>
+      <button onclick="uploadPDF()" class="btn btn-primary" style="padding:12px 28px">Upload PDF</button>
+    </div>
+    <div class="card-flat">
+      <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">Uploaded PDFs</h2>
+      <div id="pdfList"><div style="text-align:center;padding:32px;color:var(--text2)">Loading...</div></div>
+    </div>
+  `;
+  loadPDFList();
+}
+
+async function uploadPDF() {
+  const title = document.getElementById('pdfTitle').value;
+  const board = document.getElementById('pdfBoard').value;
+  const subject = document.getElementById('pdfSubject').value;
+  const price = document.getElementById('pdfPrice').value;
+  const duration = document.getElementById('pdfDuration').value;
+  const desc = document.getElementById('pdfDesc').value;
+  const file = document.getElementById('pdfFile').files[0];
+  if (!title||!board||!subject||!price||!file) { showToast('Fill all required fields'); return; }
+  const formData = new FormData();
+  formData.append('title',title);
+  formData.append('board',board);
+  formData.append('subject',subject);
+  formData.append('price',price);
+  formData.append('durationDays',duration);
+  formData.append('description',desc);
+  formData.append('pdf',file);
+  showToast('Uploading...');
+  try {
+    const res = await fetch('/api/admin/pdfs/upload', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + adminToken },
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('PDF uploaded successfully');
+      loadPDFList();
+      document.getElementById('pdfTitle').value='';
+      document.getElementById('pdfSubject').value='';
+      document.getElementById('pdfPrice').value='';
+      document.getElementById('pdfDesc').value='';
+      document.getElementById('fileName').textContent='';
+    } else {
+      showToast(data.error||'Upload failed');
+    }
+  } catch { showToast('Upload failed'); }
+}
+
+async function loadPDFList() {
+  const list = document.getElementById('pdfList');
+  try {
+    const res = await fetch('/api/admin/pdfs', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    const data = await res.json();
+    if (!data.pdfs || data.pdfs.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text2)">No PDFs uploaded yet</div>`;
+      return;
+    }
+    list.innerHTML = `
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Board</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Sales</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.pdfs.map(p => `
+            <tr>
+              <td>
+                <div style="font-weight:600;color:var(--white)">${p.title}</div>
+                <div style="font-size:12px;color:var(--text2)">${p.subject}</div>
+              </td>
+              <td><span class="badge badge-purple">${p.board?.toUpperCase()}</span></td>
+              <td style="font-weight:700;color:var(--accent2)">Rs.${p.price}</td>
+              <td style="color:var(--text2)">${p.durationDays} days</td>
+              <td style="font-weight:600;color:var(--white)">${p.totalSales||0}</td>
+              <td><button onclick="deletePDF('${p.id}')" class="btn btn-danger" style="padding:6px 14px;font-size:12px">Delete</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch {
+    list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--accent2)">Failed to load</div>`;
+  }
+}
+
+async function deletePDF(id) {
+  if (!confirm('Delete this PDF? Students will lose access.')) return;
+  try {
+    const res = await fetch('/api/admin/pdfs/'+id, { method:'DELETE', headers:{'Authorization':'Bearer '+adminToken} });
+    const data = await res.json();
+    if (data.success) { showToast('PDF deleted'); loadPDFList(); }
+  } catch { showToast('Failed'); }
+}
+
+async function renderStudents() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `
+    <div class="section-header">
+      <h1>Students</h1>
+      <p>All registered students on Cosmic AI</p>
+    </div>
+    <div class="card-flat">
+      <div id="studentList"><div style="text-align:center;padding:40px;color:var(--text2)">Loading...</div></div>
+    </div>
+  `;
+  try {
+    const res = await fetch('/api/admin/students', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    const data = await res.json();
+    const list = document.getElementById('studentList');
+    if (!data.students || data.students.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text2)">No students yet</div>`;
+      return;
+    }
+    list.innerHTML = `
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Joined</th>
+            <th>Purchases</th>
+            <th>Total Spent</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.students.map(s => `
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;flex-shrink:0">${(s.name||'U')[0].toUpperCase()}</div>
+                  <div>
+                    <div style="font-weight:600;color:var(--white)">${s.name}</div>
+                    <div style="font-size:12px;color:var(--text2)">${s.email}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--text2)">${new Date(s.createdAt).toLocaleDateString('en-IN')}</td>
+              <td style="font-weight:600;color:var(--white)">${s.totalPurchases}</td>
+              <td style="font-weight:700;color:var(--accent2)">Rs.${s.totalSpent}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch {
+    document.getElementById('studentList').innerHTML = `<div style="text-align:center;padding:40px;color:var(--accent2)">Failed to load</div>`;
+  }
+}
+
+async function renderRevenue() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--text2)">Loading...</div>`;
+  try {
+    const res = await fetch('/api/admin/dashboard', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    const data = await res.json();
+    const s = data.stats;
+    c.innerHTML = `
+      <div class="section-header">
+        <h1>Revenue</h1>
+        <p>Financial overview of Cosmic AI</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px">
+        <div class="stat-card" style="border-left:3px solid var(--accent3)">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Total Revenue</div>
+          <div class="stat-value" style="color:var(--accent3)">Rs.${s.totalRevenue}</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid var(--accent)">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Total Sales</div>
+          <div class="stat-value" style="color:var(--accent)">${s.totalSales}</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid var(--accent2)">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Avg per Sale</div>
+          <div class="stat-value" style="color:var(--accent2)">Rs.${s.totalSales>0?Math.round(s.totalRevenue/s.totalSales):0}</div>
+        </div>
+      </div>
+      <div class="card-flat">
+        <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:24px">Revenue by Subject</h2>
+        ${Object.keys(data.revenueBySubject||{}).length > 0
+          ? Object.entries(data.revenueBySubject).sort((a,b)=>b[1]-a[1]).map(([sub,amt]) => `
+            <div style="margin-bottom:20px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:14px;color:var(--text)">${sub}</span>
+                <span style="font-size:14px;font-weight:700;color:var(--accent2)">Rs.${amt}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:${Math.min(100,(amt/Math.max(...Object.values(data.revenueBySubject)))*100)}%"></div>
+              </div>
+            </div>
+          `).join('')
+          : `<div style="text-align:center;padding:32px;color:var(--text2)">No revenue data yet</div>`
+        }
+      </div>
+    `;
+  } catch {
+    c.innerHTML = `<div style="text-align:center;padding:60px;color:var(--accent2)">Failed to load</div>`;
+  }
+}
+
+async function renderSettings() {
+  const c = document.getElementById('adminContent');
+  c.innerHTML = `
+    <div class="section-header">
+      <h1>Settings</h1>
+      <p>Manage UPI and admin configuration</p>
+    </div>
+    <div class="card-flat" style="margin-bottom:20px;max-width:520px">
+      <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">UPI Payment Settings</h2>
+      <div class="form-group">
+        <label>Your UPI ID</label>
+        <input type="text" id="upiId" placeholder="yourname@upi">
+      </div>
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" id="upiName" placeholder="Cosmic AI">
+      </div>
+      <div class="form-group">
+        <label>QR Code URL (optional)</label>
+        <input type="text" id="qrCode" placeholder="https://... image link of your QR code">
+      </div>
+      <button onclick="saveUPI()" class="btn btn-primary" style="padding:12px 24px">Save UPI Settings</button>
+    </div>
+    <div class="card-flat" style="max-width:440px">
+      <h2 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">Change Admin Password</h2>
+      <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" id="oldPass" placeholder="Current password">
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="newPass" placeholder="New password">
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPass" placeholder="Confirm new password">
+      </div>
+      <button onclick="changePassword()" class="btn btn-primary" style="padding:12px 24px">Update Password</button>
+    </div>
+  `;
+  try {
+    const res = await fetch('/api/payments/upi-details', { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    const data = await res.json();
+    if (data.upiId) document.getElementById('upiId').value = data.upiId;
+    if (data.upiName) document.getElementById('upiName').value = data.upiName;
+    if (data.qrCode) document.getElementById('qrCode').value = data.qrCode;
+  } catch {}
+}
+
+async function saveUPI() {
+  const upiId = document.getElementById('upiId').value;
+  const upiName = document.getElementById('upiName').value;
+  const qrCode = document.getElementById('qrCode').value;
+  if (!upiId||!upiName) { showToast('Enter UPI ID and Name'); return; }
+  try {
+    const res = await fetch('/api/admin/settings/upi', {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+adminToken,'Content-Type':'application/json'},
+      body: JSON.stringify({upiId,upiName,qrCode})
+    });
+    const data = await res.json();
+    if (data.success) showToast('UPI settings saved');
+    else showToast(data.error||'Failed');
+  } catch { showToast('Network error'); }
+}
+
+async function changePassword() {
+  const oldPass = document.getElementById('oldPass').value;
+  const newPass = document.getElementById('newPass').value;
+  const confirmPass = document.getElementById('confirmPass').value;
+  if (!oldPass||!newPass) { showToast('Fill all fields'); return; }
+  if (newPass !== confirmPass) { showToast('Passwords do not match'); return; }
+  if (newPass.length < 6) { showToast('Password must be 6 or more characters'); return; }
+  try {
+    const res = await fetch('/api/admin/settings/password', {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+adminToken,'Content-Type':'application/json'},
+      body: JSON.stringify({oldPassword:oldPass,newPassword:newPass})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Password changed successfully');
+      document.getElementById('oldPass').value='';
+      document.getElementById('newPass').value='';
+      document.getElementById('confirmPass').value='';
+    } else {
+      showToast(data.error||'Failed');
+    }
+  } catch { showToast('Network error'); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>
