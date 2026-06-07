@@ -10,7 +10,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Uploads folder serve karo
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.pdf')) {
+      res.set('Content-Type', 'application/pdf');
+      res.set('Content-Disposition', 'inline');
+    }
+    if (filePath.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+      res.set('Content-Type', 'image/jpeg');
+    }
+  }
+}));
+
+// Frontend serve karo
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Upload folders banao

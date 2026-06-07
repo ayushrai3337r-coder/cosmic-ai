@@ -7,32 +7,34 @@
 <link rel="stylesheet" href="/css/style.css">
 <style>
 .viewer-wrap {
-  background: #f5f5f5;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
-  min-height: 85vh;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 .watermark-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 10;
+  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 .watermark-text {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 900;
-  color: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.05);
   transform: rotate(-30deg);
   white-space: nowrap;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: 4px;
+  text-align: center;
 }
 .protected-bar {
   background: rgba(255,101,132,0.06);
@@ -43,6 +45,33 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
+}
+.pdf-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+#pdfCanvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+#canvasContainer {
+  overflow-y: auto;
+  max-height: 80vh;
+  background: #e0e0e0;
+  padding: 16px;
+}
+.page-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 100px;
+  text-align: center;
 }
 </style>
 </head>
@@ -55,7 +84,9 @@
   </div>
   <div class="nav-actions">
     <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,101,132,0.08);border:1px solid rgba(255,101,132,0.2);border-radius:8px">
-      <svg width="14" height="14" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <svg width="14" height="14" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
       <span style="font-size:13px;font-weight:600;color:var(--accent2)">Protected</span>
     </div>
     <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-ghost">Back</button>
@@ -67,7 +98,9 @@
 
     <div style="margin-bottom:20px">
       <button onclick="window.location.href='/pages/dashboard.html'" style="display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px;margin-bottom:16px;font-family:'DM Sans',sans-serif;font-weight:500">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
         Back to Dashboard
       </button>
       <h1 class="serif" style="font-size:24px;font-weight:700;color:var(--text);margin-bottom:6px" id="pdfTitle">Loading...</h1>
@@ -75,31 +108,56 @@
     </div>
 
     <div class="protected-bar">
-      <svg width="16" height="16" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span style="font-size:13px;color:var(--text2)">This content is <strong style="color:var(--text)">protected and watermarked</strong> with your account. Sharing is prohibited.</span>
+      <svg width="16" height="16" fill="none" stroke="var(--accent2)" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span style="font-size:13px;color:var(--text2)">
+        This content is <strong style="color:var(--text)">protected and watermarked</strong>. Sharing is prohibited.
+      </span>
     </div>
 
-    <div class="viewer-wrap" id="viewerWrap">
-      <div class="watermark-overlay">
-        <div class="watermark-text" id="watermarkText">COSMIC AI PROTECTED</div>
-      </div>
-      <div id="pdfContainer" style="width:100%;min-height:85vh;display:flex;align-items:center;justify-content:center">
-        <p style="color:var(--text2)">Loading PDF...</p>
-      </div>
+    <div id="loadingBox" style="text-align:center;padding:60px;color:var(--text2)">
+      Loading PDF...
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
-      <div class="card-flat" style="text-align:center;padding:16px">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Status</div>
-        <div style="font-size:14px;font-weight:700;color:var(--accent3)">Active</div>
+    <div id="accessDenied" style="display:none;text-align:center;padding:60px">
+      <p style="color:var(--accent2);font-size:16px;font-weight:600;margin-bottom:12px">Access Denied</p>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:24px">You do not have access or subscription has expired.</p>
+      <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-primary">Go to Dashboard</button>
+    </div>
+
+    <div id="viewerSection" style="display:none">
+      <div class="viewer-wrap" id="viewerWrap">
+        <div class="watermark-overlay">
+          <div class="watermark-text" id="watermarkText">COSMIC AI PROTECTED</div>
+        </div>
+
+        <div class="pdf-controls">
+          <button onclick="prevPage()" class="btn btn-ghost" style="padding:8px 16px;font-size:13px">Previous</button>
+          <div class="page-info" id="pageInfo">Page 1 of 1</div>
+          <button onclick="nextPage()" class="btn btn-ghost" style="padding:8px 16px;font-size:13px">Next</button>
+          <button onclick="zoomIn()" class="btn btn-ghost" style="padding:8px 12px;font-size:13px">Zoom In</button>
+          <button onclick="zoomOut()" class="btn btn-ghost" style="padding:8px 12px;font-size:13px">Zoom Out</button>
+        </div>
+
+        <div id="canvasContainer">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
       </div>
-      <div class="card-flat" style="text-align:center;padding:16px">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Expires</div>
-        <div style="font-size:14px;font-weight:700;color:var(--text)" id="expiryInfo">Loading...</div>
-      </div>
-      <div class="card-flat" style="text-align:center;padding:16px">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Access</div>
-        <div style="font-size:14px;font-weight:700;color:var(--text)">View Only</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+        <div class="card-flat" style="text-align:center;padding:16px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Status</div>
+          <div style="font-size:14px;font-weight:700;color:var(--accent3)">Active</div>
+        </div>
+        <div class="card-flat" style="text-align:center;padding:16px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Expires</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)" id="expiryInfo">Loading...</div>
+        </div>
+        <div class="card-flat" style="text-align:center;padding:16px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Access</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">View Only</div>
+        </div>
       </div>
     </div>
 
@@ -108,7 +166,13 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script src="/pdfjs/build/pdf.mjs" type="module"></script>
+
+<script type="module">
+import * as pdfjsLib from '/pdfjs/build/pdf.mjs';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/build/pdf.worker.mjs';
+
 const token = localStorage.getItem('cosmicToken');
 const user = JSON.parse(localStorage.getItem('cosmicUser') || '{}');
 if (!token) window.location.href = '/pages/login.html';
@@ -117,24 +181,25 @@ const params = new URLSearchParams(window.location.search);
 const pdfId = params.get('id');
 const pdfTitle = decodeURIComponent(params.get('title') || '');
 
-window.onload = async () => {
-  document.getElementById('pdfTitle').textContent = pdfTitle;
-  document.getElementById('watermarkText').textContent = (user.email || 'COSMIC AI') + ' — PROTECTED';
+let pdfDoc = null;
+let currentPage = 1;
+let totalPages = 1;
+let scale = 1.4;
 
+document.getElementById('pdfTitle').textContent = pdfTitle;
+document.getElementById('watermarkText').textContent = (user.email || 'COSMIC AI') + ' — PROTECTED';
+
+async function init() {
   try {
     const res = await fetch('/api/pdfs/' + pdfId + '/view', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     const data = await res.json();
 
+    document.getElementById('loadingBox').style.display = 'none';
+
     if (!data.success) {
-      document.getElementById('pdfContainer').innerHTML = `
-        <div style="padding:60px;text-align:center">
-          <p style="color:var(--accent2);font-size:16px;font-weight:600;margin-bottom:12px">Access Denied</p>
-          <p style="color:var(--text2);font-size:14px;margin-bottom:24px">You do not have access or subscription has expired.</p>
-          <button onclick="window.location.href='/pages/dashboard.html'" class="btn btn-primary">Go to Dashboard</button>
-        </div>
-      `;
+      document.getElementById('accessDenied').style.display = 'block';
       return;
     }
 
@@ -142,29 +207,67 @@ window.onload = async () => {
       document.getElementById('expiryInfo').textContent = new Date(data.expiryDate).toLocaleDateString('en-IN');
     }
 
-    const filePath = data.filePath;
-    const container = document.getElementById('pdfContainer');
+    document.getElementById('viewerSection').style.display = 'block';
 
-    // Try Google Docs viewer first (works on mobile too)
-    const fullUrl = window.location.origin + filePath;
-    const googleDocsUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(fullUrl) + '&embedded=true';
-
-    container.innerHTML = `
-      <iframe
-        src="${googleDocsUrl}"
-        style="width:100%;height:85vh;border:none;display:block;border-radius:8px"
-        allowfullscreen
-      ></iframe>
-    `;
+    const loadingTask = pdfjsLib.getDocument(data.filePath);
+    pdfDoc = await loadingTask.promise;
+    totalPages = pdfDoc.numPages;
+    renderPage(1);
 
   } catch (err) {
-    document.getElementById('pdfContainer').innerHTML = `
-      <div style="padding:60px;text-align:center">
-        <p style="color:var(--accent2);font-size:15px;margin-bottom:16px">Failed to load PDF.</p>
-        <button onclick="window.location.reload()" class="btn btn-ghost">Retry</button>
-      </div>
+    document.getElementById('loadingBox').innerHTML = `
+      <p style="color:var(--accent2);margin-bottom:16px">Failed to load PDF. Try again.</p>
+      <button onclick="window.location.reload()" class="btn btn-ghost">Retry</button>
     `;
   }
+}
+
+async function renderPage(pageNum) {
+  const page = await pdfDoc.getPage(pageNum);
+  const viewport = page.getViewport({ scale });
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Draw watermark on canvas
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.font = 'bold 48px DM Sans';
+  ctx.fillStyle = '#000';
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(-Math.PI / 6);
+  ctx.textAlign = 'center';
+  ctx.fillText((user.email || 'COSMIC AI') + ' — PROTECTED', 0, 0);
+  ctx.restore();
+
+  currentPage = pageNum;
+  document.getElementById('pageInfo').textContent = 'Page ' + currentPage + ' of ' + totalPages;
+}
+
+window.prevPage = () => {
+  if (currentPage <= 1) return;
+  renderPage(currentPage - 1);
+  document.getElementById('canvasContainer').scrollTop = 0;
+};
+
+window.nextPage = () => {
+  if (currentPage >= totalPages) return;
+  renderPage(currentPage + 1);
+  document.getElementById('canvasContainer').scrollTop = 0;
+};
+
+window.zoomIn = () => {
+  scale += 0.2;
+  renderPage(currentPage);
+};
+
+window.zoomOut = () => {
+  if (scale <= 0.6) return;
+  scale -= 0.2;
+  renderPage(currentPage);
 };
 
 document.addEventListener('keydown', (e) => {
@@ -172,7 +275,6 @@ document.addEventListener('keydown', (e) => {
     (e.ctrlKey && e.key === 's') ||
     (e.ctrlKey && e.key === 'p') ||
     (e.ctrlKey && e.key === 'u') ||
-    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
     e.key === 'F12'
   ) {
     e.preventDefault();
@@ -200,6 +302,10 @@ function showToast(msg) {
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
 }
+
+window.showToast = showToast;
+
+init();
 </script>
 </body>
 </html>
