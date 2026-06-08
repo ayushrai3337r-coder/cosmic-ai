@@ -11,7 +11,17 @@ const makeToken = (user) => jwt.sign(
   { expiresIn: '30d' }
 );
 
-// Firebase Login (Google + Email)
+// Firebase config endpoint
+router.get('/firebase-config', (req, res) => {
+  res.json({
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    appId: process.env.FIREBASE_APP_ID
+  });
+});
+
+// Firebase Login
 router.post('/firebase', async (req, res) => {
   try {
     const { firebaseUid, name, email, picture, authType } = req.body;
