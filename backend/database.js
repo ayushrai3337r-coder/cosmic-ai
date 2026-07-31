@@ -12,6 +12,7 @@ async function initDB() {
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         picture TEXT,
+        password_hash TEXT,
         auth_type TEXT DEFAULT 'email',
         created_at TIMESTAMP DEFAULT NOW()
       )
