@@ -65,6 +65,10 @@
   background: white;
   box-shadow: var(--shadow);
 }
+.google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .or-divider {
   display: flex;
   align-items: center;
@@ -186,6 +190,19 @@
         <p style="font-size:14px;color:var(--text2)">Sign in to access your study materials</p>
       </div>
 
+      <!-- GOOGLE BUTTON — uses Firebase only for Google OAuth -->
+      <button class="google-btn" id="googleBtn" onclick="googleLogin()">
+        <svg width="20" height="20" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.6 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 5C9.7 39.4 16.4 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.2 5.2C40.3 36.1 44 30.6 44 24c0-1.3-.1-2.7-.4-4z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="or-divider">or continue with email</div>
+
       <div class="tabs">
         <button class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
         <button class="tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
@@ -244,6 +261,92 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase only for Google OAuth popup -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+async function initFirebase() {
+  try {
+    const res = await fetch('/api/auth/firebase-config');
+    const config = await res.json();
+
+    // If firebase keys not configured, hide Google button silently
+    if (!config.apiKey) {
+      document.getElementById('googleBtn').style.display = 'none';
+      document.querySelector('.or-divider').style.display = 'none';
+      return;
+    }
+
+    const app = initializeApp(config);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.googleLogin = async () => {
+      const btn = document.getElementById('googleBtn');
+      btn.textContent = 'Signing in...';
+      btn.disabled = true;
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        const res = await fetch('/api/auth/firebase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firebaseUid: user.uid,
+            name: user.displayName,
+            email: user.email,
+            picture: user.photoURL,
+            authType: 'google'
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('cosmicToken', data.token);
+          localStorage.setItem('cosmicUser', JSON.stringify(data.user));
+          window.location.href = '/pages/dashboard.html';
+        } else {
+          showToast(data.error || 'Google login failed');
+          btn.innerHTML = googleBtnHTML();
+          btn.disabled = false;
+        }
+      } catch (err) {
+        // User closed popup — not a real error, just reset button quietly
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+          btn.innerHTML = googleBtnHTML();
+          btn.disabled = false;
+          return;
+        }
+        showToast('Google login failed. Try again.');
+        btn.innerHTML = googleBtnHTML();
+        btn.disabled = false;
+      }
+    };
+
+  } catch (err) {
+    // Firebase config fetch failed — hide Google button, email still works fine
+    document.getElementById('googleBtn').style.display = 'none';
+    document.querySelector('.or-divider').style.display = 'none';
+  }
+}
+
+function googleBtnHTML() {
+  return `<svg width="20" height="20" viewBox="0 0 48 48">
+    <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
+    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.6 6.3 14.7z"/>
+    <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 5C9.7 39.4 16.4 44 24 44z"/>
+    <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.2 5.2C40.3 36.1 44 30.6 44 24c0-1.3-.1-2.7-.4-4z"/>
+  </svg> Continue with Google`;
+}
+
+initFirebase();
+</script>
+
+<!-- Email login/register — calls your backend directly, no Firebase -->
 <script>
 function switchTab(tab) {
   if (tab === 'login') {
@@ -263,13 +366,19 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+  setTimeout(() => t.style.display = 'none', 3500);
 }
 
 function setLoading(btnId, loading, label) {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
   btn.textContent = loading ? 'Please wait...' : label;
+}
+
+function saveAndRedirect(data) {
+  localStorage.setItem('cosmicToken', data.token);
+  localStorage.setItem('cosmicUser', JSON.stringify(data.user));
+  window.location.href = '/pages/dashboard.html';
 }
 
 async function emailLogin() {
@@ -290,15 +399,13 @@ async function emailLogin() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.setItem('cosmicToken', data.token);
-      localStorage.setItem('cosmicUser', JSON.stringify(data.user));
-      window.location.href = '/pages/dashboard.html';
+      saveAndRedirect(data);
     } else {
       showToast(data.error || 'Login failed');
       setLoading('loginBtn', false, 'Sign In');
     }
   } catch (err) {
-    showToast('Connection error. Try again.');
+    showToast('Server not reachable. Check your connection.');
     setLoading('loginBtn', false, 'Sign In');
   }
 }
@@ -309,7 +416,7 @@ async function emailRegister() {
   const password = document.getElementById('regPassword').value;
 
   if (!name || !email || !password) { showToast('Fill all fields'); return; }
-  if (password.length < 6) { showToast('Password must be 6+ characters'); return; }
+  if (password.length < 6) { showToast('Password must be at least 6 characters'); return; }
 
   setLoading('registerBtn', true, 'Create Account');
 
@@ -323,15 +430,13 @@ async function emailRegister() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.setItem('cosmicToken', data.token);
-      localStorage.setItem('cosmicUser', JSON.stringify(data.user));
-      window.location.href = '/pages/dashboard.html';
+      saveAndRedirect(data);
     } else {
       showToast(data.error || 'Registration failed');
       setLoading('registerBtn', false, 'Create Account');
     }
   } catch (err) {
-    showToast('Connection error. Try again.');
+    showToast('Server not reachable. Check your connection.');
     setLoading('registerBtn', false, 'Create Account');
   }
 }
