@@ -17,7 +17,6 @@ async function initDB() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `;
-
     await sql`
       CREATE TABLE IF NOT EXISTS pdfs (
         id TEXT PRIMARY KEY,
@@ -33,7 +32,6 @@ async function initDB() {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `;
-
     await sql`
       CREATE TABLE IF NOT EXISTS payments (
         id TEXT PRIMARY KEY,
@@ -51,7 +49,6 @@ async function initDB() {
         rejected_at TIMESTAMP
       )
     `;
-
     await sql`
       CREATE TABLE IF NOT EXISTS purchases (
         id TEXT PRIMARY KEY,
@@ -63,7 +60,6 @@ async function initDB() {
         expiry_date TIMESTAMP NOT NULL
       )
     `;
-
     console.log('Database ready');
   } catch (error) {
     console.error('Database error:', error.message);
