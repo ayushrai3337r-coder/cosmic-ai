@@ -21,7 +21,7 @@ router.get('/firebase-config', (req, res) => {
   });
 });
 
-// Firebase Login
+// Firebase Login (Google etc.)
 router.post('/firebase', async (req, res) => {
   try {
     const { firebaseUid, name, email, picture, authType } = req.body;
@@ -33,8 +33,6 @@ router.post('/firebase', async (req, res) => {
       SELECT * FROM users WHERE firebase_uid = ${firebaseUid}
     `;
 
-    let user;
-
     if (users.length === 0) {
       const id = uuidv4();
       await sql`
@@ -44,7 +42,7 @@ router.post('/firebase', async (req, res) => {
       users = await sql`SELECT * FROM users WHERE id = ${id}`;
     }
 
-    user = users[0];
+    const user = users[0];
 
     res.json({
       success: true,
@@ -65,6 +63,7 @@ router.post('/firebase', async (req, res) => {
 router.post('/email-register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Fill all fields' });
     }
@@ -72,6 +71,7 @@ router.post('/email-register', async (req, res) => {
       return res.status(400).json({ error: 'Password min 6 characters' });
     }
 
+    // Check if email already exists
     const existing = await sql`
       SELECT id FROM users WHERE email = ${email}
     `;
@@ -80,11 +80,13 @@ router.post('/email-register', async (req, res) => {
     }
 
     const id = uuidv4();
-    const hashed = bcrypt.hashSync(password, 10);
+
+    // Hash the password and store it
+    const password_hash = bcrypt.hashSync(password, 10);
 
     await sql`
-      INSERT INTO users (id, firebase_uid, name, email, picture, auth_type)
-      VALUES (${id}, ${id}, ${name}, ${email}, ${''}, ${'email'})
+      INSERT INTO users (id, firebase_uid, name, email, picture, password_hash, auth_type)
+      VALUES (${id}, ${id}, ${name}, ${email}, ${''}, ${password_hash}, ${'email'})
     `;
 
     const user = { id, name, email, picture: '' };
@@ -103,10 +105,12 @@ router.post('/email-register', async (req, res) => {
 router.post('/email-login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Fill all fields' });
     }
 
+    // Find user by email and auth type
     const users = await sql`
       SELECT * FROM users WHERE email = ${email} AND auth_type = 'email'
     `;
@@ -114,14 +118,27 @@ router.post('/email-login', async (req, res) => {
       return res.status(401).json({ error: 'Email not found' });
     }
 
+    const user = users[0];
+
+    // Check if password_hash exists (safety guard)
+    if (!user.password_hash) {
+      return res.status(401).json({ error: 'Account has no password set. Use Google login.' });
+    }
+
+    // Verify password against stored hash
+    const isValid = bcrypt.compareSync(password, user.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Wrong password' });
+    }
+
     res.json({
       success: true,
-      token: makeToken(users[0]),
+      token: makeToken(user),
       user: {
-        id: users[0].id,
-        name: users[0].name,
-        email: users[0].email,
-        picture: users[0].picture
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture
       }
     });
   } catch (error) {
