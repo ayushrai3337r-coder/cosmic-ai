@@ -60,15 +60,8 @@
   font-family: 'DM Sans', sans-serif;
   transition: all 0.2s;
 }
-.google-btn:hover {
-  border-color: var(--accent);
-  background: white;
-  box-shadow: var(--shadow);
-}
-.google-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.google-btn:hover { border-color: var(--accent); background: white; box-shadow: var(--shadow); }
+.google-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .or-divider {
   display: flex;
   align-items: center;
@@ -77,12 +70,8 @@
   color: var(--text2);
   font-size: 13px;
 }
-.or-divider::before,
-.or-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+.or-divider::before, .or-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
 }
 .tabs {
   display: flex;
@@ -92,23 +81,12 @@
   margin-bottom: 24px;
 }
 .tab {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  background: none;
-  color: var(--text2);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
+  flex: 1; padding: 10px; border: none; background: none;
+  color: var(--text2); font-size: 14px; font-weight: 600;
+  cursor: pointer; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
 }
-.tab.active {
-  background: white;
-  color: var(--text);
-  box-shadow: var(--shadow);
-}
+.tab.active { background: white; color: var(--text); box-shadow: var(--shadow); }
 .quote-card {
   background: rgba(108,99,255,0.1);
   border: 1px solid rgba(108,99,255,0.2);
@@ -132,15 +110,13 @@
       <div class="logo-icon">C</div>
       <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:white">Cosmic AI</span>
     </a>
-
     <div style="position:relative;z-index:1">
       <h2 style="font-size:36px;font-weight:800;color:white;line-height:1.2;margin-bottom:20px;font-family:'Playfair Display',serif">
         Your exam success<br>starts here
       </h2>
       <p style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:40px">
-        Access premium study materials for SSC, MSBTE and CBSE boards. Chapter-wise notes, important questions and solved papers.
+        Access premium study materials for SSC, MSBTE and CBSE boards.
       </p>
-
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:40px">
         <div style="display:flex;align-items:center;gap:14px">
           <div style="width:32px;height:32px;background:rgba(108,99,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -161,7 +137,6 @@
           <span style="font-size:14px;color:rgba(255,255,255,0.6)">Pay via UPI and get instant access</span>
         </div>
       </div>
-
       <div class="quote-card">
         <p style="font-size:15px;color:rgba(255,255,255,0.8);line-height:1.7;font-style:italic;margin-bottom:16px">
           "Cosmic AI helped me score 87% in SSC boards. The important questions were exactly what came in the exam."
@@ -175,10 +150,7 @@
         </div>
       </div>
     </div>
-
-    <div style="font-size:12px;color:rgba(255,255,255,0.3)">
-      2025 Cosmic AI. All rights reserved.
-    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3)">2025 Cosmic AI. All rights reserved.</div>
   </div>
 
   <!-- RIGHT SIDE -->
@@ -190,7 +162,7 @@
         <p style="font-size:14px;color:var(--text2)">Sign in to access your study materials</p>
       </div>
 
-      <!-- GOOGLE BUTTON — uses Firebase only for Google OAuth -->
+      <!-- Google Button -->
       <button class="google-btn" id="googleBtn" onclick="googleLogin()">
         <svg width="20" height="20" viewBox="0 0 48 48">
           <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
@@ -201,14 +173,14 @@
         Continue with Google
       </button>
 
-      <div class="or-divider">or continue with email</div>
+      <div class="or-divider" id="orDivider">or continue with email</div>
 
       <div class="tabs">
         <button class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
         <button class="tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
       </div>
 
-      <!-- LOGIN FORM -->
+      <!-- Login Form -->
       <div id="loginForm">
         <div class="form-group">
           <label>Email Address</label>
@@ -221,13 +193,12 @@
         </div>
         <button class="btn btn-primary"
           style="width:100%;padding:14px;font-size:15px;justify-content:center"
-          id="loginBtn"
-          onclick="emailLogin()">
+          id="loginBtn" onclick="emailLogin()">
           Sign In
         </button>
       </div>
 
-      <!-- REGISTER FORM -->
+      <!-- Register Form -->
       <div id="registerForm" style="display:none">
         <div class="form-group">
           <label>Full Name</label>
@@ -244,8 +215,7 @@
         </div>
         <button class="btn btn-primary"
           style="width:100%;padding:14px;font-size:15px;justify-content:center"
-          id="registerBtn"
-          onclick="emailRegister()">
+          id="registerBtn" onclick="emailRegister()">
           Create Account
         </button>
       </div>
@@ -256,25 +226,30 @@
 
     </div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase only for Google OAuth popup -->
+<!-- Firebase — only for Google OAuth -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+const GOOGLE_SVG = `<svg width="20" height="20" viewBox="0 0 48 48">
+  <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
+  <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.6 6.3 14.7z"/>
+  <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 5C9.7 39.4 16.4 44 24 44z"/>
+  <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.2 5.2C40.3 36.1 44 30.6 44 24c0-1.3-.1-2.7-.4-4z"/>
+</svg> Continue with Google`;
 
 async function initFirebase() {
   try {
     const res = await fetch('/api/auth/firebase-config');
     const config = await res.json();
 
-    // If firebase keys not configured, hide Google button silently
     if (!config.apiKey) {
       document.getElementById('googleBtn').style.display = 'none';
-      document.querySelector('.or-divider').style.display = 'none';
+      document.getElementById('orDivider').style.display = 'none';
       return;
     }
 
@@ -284,69 +259,54 @@ async function initFirebase() {
 
     window.googleLogin = async () => {
       const btn = document.getElementById('googleBtn');
-      btn.textContent = 'Signing in...';
+      btn.innerHTML = 'Signing in...';
       btn.disabled = true;
-
       try {
         const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
+        const u = result.user;
         const res = await fetch('/api/auth/firebase', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            firebaseUid: user.uid,
-            name: user.displayName,
-            email: user.email,
-            picture: user.photoURL,
+            firebaseUid: u.uid,
+            name: u.displayName,
+            email: u.email,
+            picture: u.photoURL,
             authType: 'google'
           })
         });
-
         const data = await res.json();
-
         if (data.success) {
           localStorage.setItem('cosmicToken', data.token);
           localStorage.setItem('cosmicUser', JSON.stringify(data.user));
           window.location.href = '/pages/dashboard.html';
         } else {
           showToast(data.error || 'Google login failed');
-          btn.innerHTML = googleBtnHTML();
+          btn.innerHTML = GOOGLE_SVG;
           btn.disabled = false;
         }
       } catch (err) {
-        // User closed popup — not a real error, just reset button quietly
         if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-          btn.innerHTML = googleBtnHTML();
+          btn.innerHTML = GOOGLE_SVG;
           btn.disabled = false;
           return;
         }
         showToast('Google login failed. Try again.');
-        btn.innerHTML = googleBtnHTML();
+        btn.innerHTML = GOOGLE_SVG;
         btn.disabled = false;
       }
     };
 
   } catch (err) {
-    // Firebase config fetch failed — hide Google button, email still works fine
     document.getElementById('googleBtn').style.display = 'none';
-    document.querySelector('.or-divider').style.display = 'none';
+    document.getElementById('orDivider').style.display = 'none';
   }
-}
-
-function googleBtnHTML() {
-  return `<svg width="20" height="20" viewBox="0 0 48 48">
-    <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"/>
-    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.6 6.3 14.7z"/>
-    <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.2C29.4 35.5 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 5C9.7 39.4 16.4 44 24 44z"/>
-    <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.8 6.3l6.2 5.2C40.3 36.1 44 30.6 44 24c0-1.3-.1-2.7-.4-4z"/>
-  </svg> Continue with Google`;
 }
 
 initFirebase();
 </script>
 
-<!-- Email login/register — calls your backend directly, no Firebase -->
+<!-- Email auth — calls backend directly, no Firebase -->
 <script>
 function switchTab(tab) {
   if (tab === 'login') {
@@ -384,20 +344,16 @@ function saveAndRedirect(data) {
 async function emailLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-
   if (!email || !password) { showToast('Fill all fields'); return; }
 
   setLoading('loginBtn', true, 'Sign In');
-
   try {
     const res = await fetch('/api/auth/email-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-
     const data = await res.json();
-
     if (data.success) {
       saveAndRedirect(data);
     } else {
@@ -405,7 +361,7 @@ async function emailLogin() {
       setLoading('loginBtn', false, 'Sign In');
     }
   } catch (err) {
-    showToast('Server not reachable. Check your connection.');
+    showToast('Could not reach server. Check your internet.');
     setLoading('loginBtn', false, 'Sign In');
   }
 }
@@ -414,21 +370,17 @@ async function emailRegister() {
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPassword').value;
-
   if (!name || !email || !password) { showToast('Fill all fields'); return; }
   if (password.length < 6) { showToast('Password must be at least 6 characters'); return; }
 
   setLoading('registerBtn', true, 'Create Account');
-
   try {
     const res = await fetch('/api/auth/email-register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password })
     });
-
     const data = await res.json();
-
     if (data.success) {
       saveAndRedirect(data);
     } else {
@@ -436,7 +388,7 @@ async function emailRegister() {
       setLoading('registerBtn', false, 'Create Account');
     }
   } catch (err) {
-    showToast('Server not reachable. Check your connection.');
+    showToast('Could not reach server. Check your internet.');
     setLoading('registerBtn', false, 'Create Account');
   }
 }
