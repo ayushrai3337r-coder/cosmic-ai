@@ -1,10 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+document.addEventListener('DOMContentLoaded', () => {
+  const root = document.getElementById('root');
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+  if (root) {
+    root.innerHTML = `
+      <main style="font-family: Arial, sans-serif; max-width: 720px; margin: 80px auto; padding: 24px; color: #111827; line-height: 1.6;">
+        <h1 style="font-size: 2rem; margin-bottom: 12px;">Cosmic AI</h1>
+        <p>This project is now using plain HTML, CSS, and JavaScript.</p>
+        <p>React and Vite were removed from the frontend.</p>
+      </main>
+    `;
+  }
+});

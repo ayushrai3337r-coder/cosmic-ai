@@ -1,16 +1,26 @@
-# React + Vite
+# Cosmic AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This frontend is now built with plain HTML, CSS, and JavaScript only.
 
-Currently, two official plugins are available:
+No React and no Vite are used in this project.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run locally
 
-## React Compiler
+From the `frontend` folder:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+python3 -m http.server 8000
+```
 
-## Expanding the ESLint configuration
+Then open:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+http://localhost:8000
+```
+
+## Structure
+
+- `index.html` - landing page
+- `css/style.css` - site styling
+- `js/main.js` - page interactions
+- `pages/` - additional HTML pages

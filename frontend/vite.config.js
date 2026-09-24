@@ -1,7 +1,4 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// This project no longer uses Vite or React.
+// The frontend is served as plain HTML, CSS, and JavaScript.
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+export default {};
